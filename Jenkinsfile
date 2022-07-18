@@ -119,10 +119,12 @@ pipeline {
                 sh "git tag v${VERSION}"
                 withGo('Go 1.18') {
                     sh """
-                        test -z "$TMPDIR" && TMPDIR="$(mktemp -d)"
+                        test -z "$TMPDIR" && TMPDIR="\$(mktemp -d)"
                         echo "$GPG_PRIVATE_KEY" > "${TMPDIR}/secret.txt"
                         gpg --import "${TMPDIR}/secret.txt"
                         rm -f "${TMPDIR}/secret.txt"
+
+                        # go install github.com/goreleaser/goreleaser@latest
                         goreleaser release --rm-dist
                     """
                 }
