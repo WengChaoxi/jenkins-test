@@ -8,7 +8,11 @@ pipeline {
             defaultValue: false,
             description: 'When checked, will clean workspace.')
 
-        string(name: 'VERSION',
+        string(name: 'GORELEASER_VERSION',
+            defaultValue: '1.10.2',
+            description: 'The version of the goreleaser')
+
+        string(name: 'PROVIDER_VERSION',
             defaultValue: '0.0.1',
             description: 'The version of the terraform provider')
     }
@@ -28,19 +32,24 @@ pipeline {
 
         stage("github release") {
             environment {
-                GITHUB_TOKEN = "${env.GITHUB_TOKEN}"
-                // GPG_PRIVATE_KEY = credentials('gpg-private-key')
+                GITHUB_TOKEN = credentials('github-token')
                 GPG_PRIVATE_KEY_FILE = credentials('gpg-private-key-file')
-                GPG_FINGERPRINT = "admin <admin@wengcx.top>"
+                GPG_FINGERPRINT = credentials("gpg-fingerprint")
             }
             steps {
-                sh "git tag v${VERSION}"
-                withGo('Go 1.18') {
-                    sh """
-                        gpg --import "$GPG_PRIVATE_KEY_FILE"
-                        # go install github.com/goreleaser/goreleaser@latest
-                        goreleaser release --rm-dist
-                    """
+                script {
+                    assert params.GORELEASER_VERSION
+                    assert params.PROVIDER_VERSION
+
+                    sh "git tag v${params.PROVIDER_VERSION}"
+
+                    withGo('Go 1.18') {
+                        sh """
+                            go install github.com/goreleaser/goreleaser@v${params.GORELEASER_VERSION}
+                            gpg --import "$GPG_PRIVATE_KEY_FILE"
+                            goreleaser release --rm-dist
+                        """
+                    }
                 }
             }
         }
