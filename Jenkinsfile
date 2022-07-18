@@ -7,11 +7,7 @@ pipeline {
         booleanParam(name: 'CLEAN_WS',
             defaultValue: false,
             description: 'When checked, will clean workspace.')
-
-        string(name: 'GORELEASER_VERSION',
-            defaultValue: '1.10.2',
-            description: 'The version of the goreleaser')
-
+            
         string(name: 'PROVIDER_VERSION',
             defaultValue: '0.0.1',
             description: 'The version of the terraform provider')
@@ -38,17 +34,17 @@ pipeline {
             }
             steps {
                 script {
-                    assert params.GORELEASER_VERSION
                     assert params.PROVIDER_VERSION
 
                     sh "git tag v${params.PROVIDER_VERSION}"
 
                     withGo('Go 1.18') {
-                        sh """
-                            go install github.com/goreleaser/goreleaser@v${params.GORELEASER_VERSION}
-                            gpg --import "$GPG_PRIVATE_KEY_FILE"
-                            goreleaser release --rm-dist
-                        """
+                        withGoReleaser('1.10.2') {
+                            sh """
+                                gpg --import "$GPG_PRIVATE_KEY_FILE"
+                                goreleaser release --rm-dist
+                            """
+                        }
                     }
                 }
             }
