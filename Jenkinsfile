@@ -108,21 +108,8 @@ pipeline {
                 }
             }
         }
-        // stage("check") {
-        //     // file: terraform-registry-manifest.json
-        //     // file: .goreleaser.yml
-
-        //     // env: GITHUB_TOKEN
-        //     // env: GPG_FINGERPRINT
-
-        //     // tool: GPG
-        //     // tool: GoReleaser
-        // }
 
         stage("github release") {
-            // when {
-            //     check()
-            // }
             environment {
                 GITHUB_TOKEN = "${env.GITHUB_TOKEN}"
                 GPG_PRIVATE_KEY = credentials('gpg-private-key')
@@ -131,7 +118,13 @@ pipeline {
             steps {
                 sh "git tag v${VERSION}"
                 withGo('Go 1.18') {
-                    sh 'curl -sfL http://cdn.wengcx.top/sh/tmp/goreleaser.sh | bash'
+                    sh """
+                        test -z "$TMPDIR" && TMPDIR="$(mktemp -d)"
+                        echo "$GPG_PRIVATE_KEY" > "${TMPDIR}/secret.txt"
+                        gpg --import "${TMPDIR}/secret.txt"
+                        rm -f "${TMPDIR}/secret.txt"
+                        goreleaser release --rm-dist
+                    """
                 }
             }
         }
