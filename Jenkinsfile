@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     assert params.PROVIDER_VERSION
-                    terraformProviderRelease(params.PROVIDER_VERSION)
+                    terraformProviderRelease(goVersion: '1.18.4', releaseVersion: params.PROVIDER_VERSION)
                 }
             }
         }
