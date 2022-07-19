@@ -20,6 +20,7 @@ pipeline {
                     if (params.CLEAN_WS) {
                         sh 'git tag -d `git tag`'
                         sh 'git reset HEAD --hard'
+                        sh 'rm -rf dist'
                         // cleanWs()
                     }
                 }
@@ -35,7 +36,7 @@ pipeline {
             steps {
                 script {
                     assert params.PROVIDER_VERSION
-                    
+
                     terraformProviderRelease(releaseVersion: params.PROVIDER_VERSION, githubToken: "$GITHUB_TOKEN", 
                         gpgPrivateKeyFile: "$GPG_PRIVATE_KEY_FILE", gpgFingerprint: "$GPG_FINGERPRINT")
                 }
