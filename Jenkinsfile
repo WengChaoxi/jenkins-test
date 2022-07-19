@@ -10,18 +10,11 @@ pipeline {
     }
 
     stages {
-        stage("release") {
-            environment {
-                GITHUB_TOKEN = credentials('github-token')
-                GPG_PRIVATE_KEY_FILE = credentials('gpg-private-key-file')
-                GPG_FINGERPRINT = credentials("gpg-fingerprint")
-            }
+        stage("Release") {
             steps {
                 script {
                     assert params.PROVIDER_VERSION
-
-                    terraformProviderRelease(releaseVersion: params.PROVIDER_VERSION, githubToken: "$GITHUB_TOKEN", 
-                        gpgPrivateKeyFile: "$GPG_PRIVATE_KEY_FILE", gpgFingerprint: "$GPG_FINGERPRINT")
+                    terraformProviderRelease(params.PROVIDER_VERSION)
                 }
             }
         }
