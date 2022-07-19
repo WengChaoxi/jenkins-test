@@ -35,17 +35,9 @@ pipeline {
             steps {
                 script {
                     assert params.PROVIDER_VERSION
-
-                    sh "git tag v${params.PROVIDER_VERSION}"
-
-                    withGo('Go 1.18') {
-                        withGoReleaser('1.10.2') {
-                            sh """
-                                gpg --import "$GPG_PRIVATE_KEY_FILE"
-                                goreleaser release --rm-dist
-                            """
-                        }
-                    }
+                    
+                    terraformProviderRelease(releaseVersion: params.PROVIDER_VERSION, githubToken: "$GITHUB_TOKEN", 
+                        gpgPrivateKeyFile: "$GPG_PRIVATE_KEY_FILE", gpgFingerprint: "$GPG_FINGERPRINT")
                 }
             }
         }
