@@ -19,10 +19,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        failure {
-            sh "git tag -d v${params.PROVIDER_VERSION}"
-        }
-    }
 }
