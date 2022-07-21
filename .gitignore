@@ -1,3 +1,5 @@
 .vscode
+.goreleaser.yml
+run.sh
 
 dist/
