@@ -43,7 +43,7 @@ pipeline {
                 }
             }
             steps {
-                terraformProviderRelease(releaseVersion: params.RELEASE_VERSION)
+                terraformProviderRelease(goVersion: '1.18.4', releaseVersion: params.RELEASE_VERSION)
             }
         }
     }
