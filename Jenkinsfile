@@ -25,13 +25,10 @@ def terraformProviderBuild(Map params = [:]) {
 pipeline {
     agent any
     parameters {
-        string(name: 'VERSION',
-            defaultValue: '0.0.1',
-            description: 'The version of the terraform provider (e.g. `0.0.1`).',
+        string(name: 'RELEASE_VERSION',
+            defaultValue: '',
+            description: 'The version of the terraform provider. (MAJOR.MINOR.PATCH, e.g. 0.0.1). If the version is left empty, release stage will be skipped.',
             trim:true)
-        booleanParam(name: 'RELEASE',
-            defaultValue: false,
-            description: 'When checked, will auto release.')
     }
     stages {
         stage("Checkout") {
@@ -39,20 +36,14 @@ pipeline {
                 checkout scm
             }
         }
-        stage("Build") {
-            steps {
-                script {
-                    assert params.VERSION
-                    terraformProviderBuild(goVersion: '1.18.4', buildVersion: params.VERSION)
+        stage("Release") {
+            when {
+                expression {
+                    params.RELEASE_VERSION != ''
                 }
             }
-        }
-        stage("Release") {
             steps {
-                script {
-                    assert params.VERSION
-                    terraformProviderRelease(goVersion: '1.18.4', releaseVersion: params.VERSION)
-                }
+                terraformProviderRelease(releaseVersion: params.RELEASE_VERSION)
             }
         }
     }
