@@ -15,7 +15,7 @@ def terraformProviderBuild(Map params = [:]) {
                     git tag v"${buildVersion}"
                     test -z `git tag -l "v${buildVersion}"` && git tag "v${buildVersion}"
                     gpg --import "${env.GPG_PRIVATE_KEY_FILE}"
-                    goreleaser release --rm-dist --skip-publish
+                    goreleaser build --rm-dist
                 """
             }
         }
