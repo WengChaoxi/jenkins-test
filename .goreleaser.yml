@@ -55,4 +55,4 @@ release:
   # If you want to manually examine the release before its live, uncomment this line:
   # draft: true
 snapshot:
-  name_template: '{{ .Branch }}_b{{ .Env.BUILD_NUMBER }}_{{ time "2006-01-02" }}'
+  name_template: '{{ .Env.BRANCH_NAME }}_b{{ .Env.BUILD_NUMBER }}_{{ time "2006-01-02" }}'
