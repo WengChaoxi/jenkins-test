@@ -17,6 +17,16 @@ pipeline {
                 checkout scm
             }
         }
+        stage("Build") {
+            when {
+                expression {
+                    params.RELEASE_VERSION == ''
+                }
+            }
+            steps {
+                goreleaser goVersion: '1.18.4', snapshot: true
+            }
+        }
         stage("Release") {
             when {
                 expression {
@@ -24,8 +34,9 @@ pipeline {
                 }
             }
             steps {
-                terraformProviderRelease(goVersion: '1.18.4', releaseVersion: params.RELEASE_VERSION)
+                goreleaser goVersion: '1.18.4', releaseVersion: params.RELEASE_VERSION
             }
         }
     }
 }
+
